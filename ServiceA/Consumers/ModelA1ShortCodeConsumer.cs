@@ -1,27 +1,28 @@
 ﻿using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using ServiceB.Models;
+using ServiceA.Models;
 using System.Text;
 using System.Text.Json;
 
-namespace ServiceB.Consumers;
+namespace ServiceA.Consumers;
 
-public class ModelA1Consumer : BackgroundService
+public class ModelA1ShortCodeConsumer : BackgroundService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IChannel _channel;
 
-    private const string ExchangeName = "modelA1_exchange";
-    private const string QueueName = "modelA1_queue1";
+    private const string ExchangeName = "modelA1ShortCode_exchange";
+    private const string QueueName = "modelAShortCode1_queue";
+    private const string RoutingKey = "modelA1ShortCode_key";
 
-    public ModelA1Consumer(IServiceScopeFactory serviceScopeFactory, IChannel channel)
+    public ModelA1ShortCodeConsumer(IServiceScopeFactory serviceScopeFactory, IChannel channel)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _channel = channel;
 
-        _channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Fanout, durable: true, autoDelete: false);
+        _channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Direct, durable: true, autoDelete: false);
         _channel.QueueDeclareAsync(QueueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        _channel.QueueBindAsync(QueueName, ExchangeName, string.Empty);
+        _channel.QueueBindAsync(QueueName, ExchangeName, RoutingKey);
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -38,20 +39,15 @@ public class ModelA1Consumer : BackgroundService
                 if (request != null)
                 {
                     using var scope = _serviceScopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<ServiceBDBContext>();
+                    var context = scope.ServiceProvider.GetRequiredService<ServiceADBContext>();
                     var set = context.Set<ModelA1>();
 
                     var modelA1 = await set.FindAsync([request.Id], cancellationToken);
-                    if (modelA1 is null)
+                    if (modelA1 is not null)
                     {
-                        await set.AddAsync(request, cancellationToken);
+                        modelA1.ShortCode = request.ShortCode;
+                        await context.SaveChangesAsync(cancellationToken);
                     }
-                    else
-                    {
-                        modelA1.Title = request.Title;
-                    }
-
-                    await context.SaveChangesAsync(cancellationToken);
                 }
 
                 await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false, cancellationToken);

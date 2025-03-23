@@ -1,16 +1,11 @@
-using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
-using ServiceA;
-using ServiceA.Consumers;
-using ServiceA.Publishers;
+using ServiceC.Consumers;
+using ServiceC.Publishers;
+using ServiceC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ServiceADBContext>(options => options.UseSqlServer(connectionString));
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSingleton<ShortCodeService>();
 
 var rabbitMQConfig = builder.Configuration.GetSection("RabbitMQ");
 builder.Services.AddSingleton<IConnectionFactory>(_ =>
@@ -33,19 +28,9 @@ builder.Services.AddSingleton(sp =>
     return connection.CreateChannelAsync().Result;
 });
 
-builder.Services.AddSingleton<ModelA1Publisher>();
-builder.Services.AddHostedService<ModelA1ShortCodeConsumer>();
-
-builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<ModelA1ShortCodePublisher>();
+builder.Services.AddHostedService<ModelA1Consumer>();
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.MapControllers();
 
 app.Run();

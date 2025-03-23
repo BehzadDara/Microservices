@@ -1,22 +1,26 @@
 ﻿using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using ServiceB.Models;
+using ServiceC.Models;
+using ServiceC.Publishers;
+using ServiceC.Services;
 using System.Text;
 using System.Text.Json;
 
-namespace ServiceB.Consumers;
+namespace ServiceC.Consumers;
 
 public class ModelA1Consumer : BackgroundService
 {
-    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly ShortCodeService _service;
+    private readonly ModelA1ShortCodePublisher _publisher;
     private readonly IChannel _channel;
 
     private const string ExchangeName = "modelA1_exchange";
-    private const string QueueName = "modelA1_queue1";
+    private const string QueueName = "modelA1_queue2";
 
-    public ModelA1Consumer(IServiceScopeFactory serviceScopeFactory, IChannel channel)
+    public ModelA1Consumer(ShortCodeService service, ModelA1ShortCodePublisher publisher, IChannel channel)
     {
-        _serviceScopeFactory = serviceScopeFactory;
+        _service = service;
+        _publisher = publisher;
         _channel = channel;
 
         _channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Fanout, durable: true, autoDelete: false);
@@ -37,21 +41,10 @@ public class ModelA1Consumer : BackgroundService
                 var request = JsonSerializer.Deserialize<ModelA1>(message);
                 if (request != null)
                 {
-                    using var scope = _serviceScopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<ServiceBDBContext>();
-                    var set = context.Set<ModelA1>();
+                    var shortCode = _service.Generate(request.Title);
+                    request.ShortCode = shortCode;
 
-                    var modelA1 = await set.FindAsync([request.Id], cancellationToken);
-                    if (modelA1 is null)
-                    {
-                        await set.AddAsync(request, cancellationToken);
-                    }
-                    else
-                    {
-                        modelA1.Title = request.Title;
-                    }
-
-                    await context.SaveChangesAsync(cancellationToken);
+                    await _publisher.PublishMessageAsync(request, cancellationToken);
                 }
 
                 await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false, cancellationToken);

@@ -1,9 +1,14 @@
+using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
+using ServiceC;
 using ServiceC.Consumers;
-using ServiceC.Publishers;
 using ServiceC.Services;
+using ServiceC.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ServiceCDBContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddSingleton<ShortCodeService>();
 
@@ -13,7 +18,7 @@ builder.Services.AddSingleton<IConnectionFactory>(_ =>
     {
         HostName = rabbitMQConfig["HostName"]!,
         UserName = rabbitMQConfig["UserName"]!,
-        Password = rabbitMQConfig["Password"]!,
+        Password = rabbitMQConfig["Password"]!
     });
 
 builder.Services.AddSingleton(sp =>
@@ -28,7 +33,7 @@ builder.Services.AddSingleton(sp =>
     return connection.CreateChannelAsync().Result;
 });
 
-builder.Services.AddSingleton<ModelA1ShortCodePublisher>();
+builder.Services.AddHostedService<OutboxWorker>();
 builder.Services.AddHostedService<ModelA1Consumer>();
 
 var app = builder.Build();

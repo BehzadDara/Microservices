@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ServiceC.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace ServiceC.Models;
 
 public class OutboxMessage
 {
-    [Key] public Guid Id { get; set; } = Guid.NewGuid();
+    [Key] public int Id { get; set; }
     public required string Event { get; set; }
     public required string Body { get; set; }
     public bool IsPublished { get; set; }

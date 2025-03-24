@@ -24,8 +24,8 @@ namespace ServiceC.Migrations
 
             modelBuilder.Entity("ServiceC.Models.OutboxMessage", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<string>("Body")
                         .IsRequired()

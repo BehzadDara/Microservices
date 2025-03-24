@@ -1,6 +1,8 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.CodeAnalysis.Differencing;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using ServiceB.Models;
+using StackExchange.Redis;
 using System.Text;
 using System.Text.Json;
 
@@ -10,14 +12,17 @@ public class ModelA1Consumer : BackgroundService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IChannel _channel;
+    private readonly IDatabase _cache;
+    private readonly string cacheKey = "modelA1_key";
 
     private const string ExchangeName = "modelA1_exchange";
     private const string QueueName = "modelA1_queue1";
 
-    public ModelA1Consumer(IServiceScopeFactory serviceScopeFactory, IChannel channel)
+    public ModelA1Consumer(IServiceScopeFactory serviceScopeFactory, IChannel channel, IConnectionMultiplexer redis)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _channel = channel;
+        _cache = redis.GetDatabase();
 
         _channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Fanout, durable: true, autoDelete: false);
         _channel.QueueDeclareAsync(QueueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
@@ -52,6 +57,7 @@ public class ModelA1Consumer : BackgroundService
                     }
 
                     await context.SaveChangesAsync(cancellationToken);
+                    await _cache.KeyDeleteAsync(cacheKey);
                 }
 
                 await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false, cancellationToken);

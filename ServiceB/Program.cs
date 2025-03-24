@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using ServiceB;
 using ServiceB.Consumers;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,9 @@ builder.Services.AddSingleton(sp =>
 });
 
 builder.Services.AddHostedService<ModelA1Consumer>();
+
+var redisConnection = builder.Configuration["Redis:ConnectionString"]!;
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection));
 
 builder.Services.AddSwaggerGen();
 

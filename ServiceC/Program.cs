@@ -1,3 +1,6 @@
+using Consul;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using ServiceC;
@@ -36,6 +39,35 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddHostedService<OutboxWorker>();
 builder.Services.AddHostedService<ModelA1Consumer>();
 
+builder.Services.AddHealthChecks();
+
+builder.Services.AddSingleton<IConsulClient, ConsulClient>(p => new ConsulClient(cfg =>
+{
+    cfg.Address = new Uri(builder.Configuration["Consul:Url"]!);
+}));
+
 var app = builder.Build();
+
+app.UseHealthChecks("/healthz", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+var consulClient = app.Services.GetRequiredService<IConsulClient>();
+
+var registration = new AgentServiceRegistration
+{
+    ID = "ServiceC",
+    Name = "ServiceC",
+    Address = "localhost",
+    Port = 5144,
+    Check = new AgentServiceCheck
+    {
+        HTTP = "https://localhost:5144/healthz",
+        Interval = TimeSpan.FromSeconds(10)
+    }
+};
+
+await consulClient.Agent.ServiceRegister(registration);
 
 app.Run();

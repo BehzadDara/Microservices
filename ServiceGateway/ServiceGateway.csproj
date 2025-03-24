@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ocelot" Version="23.4.3" />
+    <PackageReference Include="Ocelot.Provider.Consul" Version="23.4.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 

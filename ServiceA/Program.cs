@@ -1,5 +1,7 @@
+using Consul;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using ServiceA;
 using ServiceA.Consumers;
@@ -49,6 +51,13 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHealthChecks();
+
+builder.Services.AddSingleton<IConsulClient, ConsulClient>(p => new ConsulClient(cfg =>
+{
+    cfg.Address = new Uri(builder.Configuration["Consul:Url"]!);
+}));
+
 var app = builder.Build();
 
 app.UseCors();
@@ -60,5 +69,27 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+
+app.UseHealthChecks("/healthz", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+var consulClient = app.Services.GetRequiredService<IConsulClient>();
+
+var registration = new AgentServiceRegistration
+{
+    ID = "ServiceA",
+    Name = "ServiceA",
+    Address = "localhost",
+    Port = 5142,
+    Check = new AgentServiceCheck
+    {
+        HTTP = "https://localhost:5142/healthz",
+        Interval = TimeSpan.FromSeconds(10)
+    }
+};
+
+await consulClient.Agent.ServiceRegister(registration);
 
 app.Run();

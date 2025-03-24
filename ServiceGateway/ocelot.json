@@ -17,7 +17,7 @@
       "UpstreamHttpMethod": [ "POST" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "https://localhost",
+          "Host": "localhost",
           "Port": 5142
         }
       ]
@@ -28,7 +28,7 @@
       "UpstreamHttpMethod": [ "PUT", "GET" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "https://localhost",
+          "Host": "localhost",
           "Port": 5142
         }
       ]
@@ -58,5 +58,9 @@
   ],
   "GlobalConfiguration": {
     "BaseUrl": "https://localhost:5150"
+  },
+  "Consul": {
+    "Host": "localhost",
+    "Port": 8500
   }
 }

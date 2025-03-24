@@ -15,7 +15,8 @@ namespace ServiceC.Migrations
                 name: "OutboxMessages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Event = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Body = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsPublished = table.Column<bool>(type: "bit", nullable: false),

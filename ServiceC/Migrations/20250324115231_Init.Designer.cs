@@ -12,7 +12,7 @@ using ServiceC;
 namespace ServiceC.Migrations
 {
     [DbContext(typeof(ServiceCDBContext))]
-    [Migration("20250324114701_Init")]
+    [Migration("20250324115231_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -28,7 +28,10 @@ namespace ServiceC.Migrations
             modelBuilder.Entity("ServiceC.Models.OutboxMessage", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Body")
                         .IsRequired()

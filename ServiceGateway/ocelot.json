@@ -1,0 +1,62 @@
+﻿{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/swagger/v1/swagger.json",
+      "UpstreamPathTemplate": "/ServiceA/swagger/v1/swagger.json",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5142
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/ModelA1",
+      "UpstreamPathTemplate": "/ServiceA/ModelA1",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "https://localhost",
+          "Port": 5142
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/ModelA1/{id}",
+      "UpstreamPathTemplate": "/ServiceA/ModelA1/{id}",
+      "UpstreamHttpMethod": [ "PUT", "GET" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "https://localhost",
+          "Port": 5142
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/swagger/v1/swagger.json",
+      "UpstreamPathTemplate": "/ServiceB/swagger/v1/swagger.json",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5143
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/ModelA1",
+      "UpstreamPathTemplate": "/ServiceB/ModelA1",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5143
+        }
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:5150"
+  }
+}

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using ServiceA;
 using ServiceA.Consumers;
@@ -36,9 +37,21 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddSingleton<ModelA1Publisher>();
 builder.Services.AddHostedService<ModelA1ShortCodeConsumer>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {

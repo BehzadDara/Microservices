@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace ServiceB.Controllers;
 
-[Route("ModelA1")]
+[Route("ServiceB/ModelA1")]
 public class ModelA1Controller(ServiceBDBContext context, IConnectionMultiplexer redis) : ControllerBase
 {
     private readonly DbSet<ModelA1> set = context.Set<ModelA1>();

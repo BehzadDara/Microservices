@@ -6,7 +6,7 @@ using ServiceA.Publishers;
 
 namespace ServiceA.Controllers;
 
-[Route("ModelA1")]
+[Route("ServiceA/ModelA1")]
 public class ModelA1Controller(ServiceADBContext context, ModelA1Publisher publisher) : ControllerBase
 {
     private readonly DbSet<ModelA1> set = context.Set<ModelA1>();

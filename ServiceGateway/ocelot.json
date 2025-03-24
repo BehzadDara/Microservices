@@ -12,7 +12,7 @@
       ]
     },
     {
-      "DownstreamPathTemplate": "/ModelA1",
+      "DownstreamPathTemplate": "/ServiceA/ModelA1",
       "UpstreamPathTemplate": "/ServiceA/ModelA1",
       "UpstreamHttpMethod": [ "POST" ],
       "DownstreamHostAndPorts": [
@@ -23,7 +23,7 @@
       ]
     },
     {
-      "DownstreamPathTemplate": "/ModelA1/{id}",
+      "DownstreamPathTemplate": "/ServiceA/ModelA1/{id}",
       "UpstreamPathTemplate": "/ServiceA/ModelA1/{id}",
       "UpstreamHttpMethod": [ "PUT", "GET" ],
       "DownstreamHostAndPorts": [
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "DownstreamPathTemplate": "/ModelA1",
+      "DownstreamPathTemplate": "/ServiceB/ModelA1",
       "UpstreamPathTemplate": "/ServiceB/ModelA1",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamHostAndPorts": [

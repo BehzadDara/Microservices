@@ -33,6 +33,9 @@ services:
 
   redis:
     container_name: redis
+    
+  redis-commander:
+    container_name: redis-commander
 
   consul:
     container_name: consul

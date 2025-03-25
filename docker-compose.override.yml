@@ -8,6 +8,8 @@ services:
       context: .
       dockerfile: ServiceA/Dockerfile
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8001
       - ConnectionStrings:DefaultConnection=Server=sqlserver;Database=ServiceADB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true;
       - RabbitMQ:HostName=rabbitmq
       - RabbitMQ:UserName=guest
@@ -30,6 +32,8 @@ services:
       context: .
       dockerfile: ServiceB/Dockerfile
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8002
       - ConnectionStrings:DefaultConnection=Server=sqlserver;Database=ServiceBDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true;
       - RabbitMQ:HostName=rabbitmq
       - RabbitMQ:UserName=guest
@@ -56,6 +60,8 @@ services:
       context: .
       dockerfile: ServiceC/Dockerfile
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8003
       - ConnectionStrings:DefaultConnection=Server=sqlserver;Database=ServiceCDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true;
       - RabbitMQ:HostName=rabbitmq
       - RabbitMQ:UserName=guest
@@ -80,7 +86,10 @@ services:
     container_name: servicegateway
     build:
       context: .
-      dockerfile: ServiceC/Dockerfile
+      dockerfile: ServiceGateway/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8010
     ports:
       - 8010:8010
     volumes:
@@ -111,6 +120,17 @@ services:
     container_name: redis
     ports:
       - 6379:6379
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - 6380:8081
+    depends_on:
+      - redis
 
   consul:
     image: hashicorp/consul:1.15.4

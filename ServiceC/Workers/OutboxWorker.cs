@@ -1,6 +1,5 @@
 ﻿using RabbitMQ.Client;
 using System.Text;
-using System.Text.Json;
 
 namespace ServiceC.Workers;
 

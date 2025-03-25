@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using ServiceC;
 using ServiceC.Consumers;
+using ServiceC.Publishers;
 using ServiceC.Services;
 using ServiceC.Workers;
 
@@ -37,6 +38,7 @@ builder.Services.AddSingleton(sp =>
 });
 
 builder.Services.AddHostedService<OutboxWorker>();
+builder.Services.AddSingleton<ModelA1ShortCodePublisher>();
 builder.Services.AddHostedService<ModelA1Consumer>();
 
 builder.Services.AddHealthChecks();

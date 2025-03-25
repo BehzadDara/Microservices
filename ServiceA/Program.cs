@@ -61,6 +61,21 @@ builder.Services.AddSingleton<IConsulClient, ConsulClient>(p => new ConsulClient
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var dbContext = services.GetRequiredService<ServiceADBContext>();
+        dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while applying migrations of ServiceA database.");
+    }
+}
+
 app.UseCors();
 
 if (app.Environment.IsDevelopment())
@@ -82,11 +97,11 @@ var registration = new AgentServiceRegistration
 {
     ID = "ServiceA",
     Name = "ServiceA",
-    Address = "localhost",
-    Port = 5142,
+    Address = builder.Configuration["HealthCheck:Address"],
+    Port = int.Parse(builder.Configuration["HealthCheck:Port"]!),
     Check = new AgentServiceCheck
     {
-        HTTP = "https://localhost:5142/healthz",
+        HTTP = $"https://{builder.Configuration["HealthCheck:Address"]}:{int.Parse(builder.Configuration["HealthCheck:Port"]!)}/healthz",
         Interval = TimeSpan.FromSeconds(10)
     }
 };

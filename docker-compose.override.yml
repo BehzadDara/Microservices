@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  servicea:
+    image: servicea:latest
+    container_name: servicea
+    build:
+      context: .
+      dockerfile: ServiceA/Dockerfile
+    environment:
+      - ConnectionStrings:DefaultConnection=Server=sqlserver;Database=ServiceADB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true;
+      - RabbitMQ:HostName=rabbitmq
+      - RabbitMQ:UserName=guest
+      - RabbitMQ:Password=guest
+      - Consul:Url=http://consul:8500
+      - HealthCheck:Address=servicea
+      - HealthCheck:Port=8001
+    ports:
+      - 8001:8001
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - redis
+      - consul
+
+  serviceb:
+    image: serviceb:latest
+    container_name: serviceb
+    build:
+      context: .
+      dockerfile: ServiceB/Dockerfile
+    environment:
+      - ConnectionStrings:DefaultConnection=Server=sqlserver;Database=ServiceBDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true;
+      - RabbitMQ:HostName=rabbitmq
+      - RabbitMQ:UserName=guest
+      - RabbitMQ:Password=guest
+      - Redis:ConnectionString=redis:6379
+      - Consul:Url=http://consul:8500
+      - HealthCheck:Address=serviceb
+      - HealthCheck:Port=8002
+    ports:
+      - 8002:8002
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - redis
+      - consul
+
+  servicec:
+    image: servicec:latest
+    container_name: servicec
+    build:
+      context: .
+      dockerfile: ServiceC/Dockerfile
+    environment:
+      - ConnectionStrings:DefaultConnection=Server=sqlserver;Database=ServiceCDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true;
+      - RabbitMQ:HostName=rabbitmq
+      - RabbitMQ:UserName=guest
+      - RabbitMQ:Password=guest
+      - Consul:Url=http://consul:8500
+      - ShortCodeConfig:Prefix=D
+      - HealthCheck:Address=servicec
+      - HealthCheck:Port=8003
+    ports:
+      - 8003:8003
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - redis
+      - consul
+
+  servicegateway:
+    image: servicegateway:latest
+    container_name: servicegateway
+    build:
+      context: .
+      dockerfile: ServiceC/Dockerfile
+    ports:
+      - 8010:8010
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: YourStrong!Passw0rd
+      ACCEPT_EULA: Y
+    ports:
+      - 433:1433
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+
+  consul:
+    image: hashicorp/consul:1.15.4
+    container_name: consul
+    ports:
+      - 8500:8500

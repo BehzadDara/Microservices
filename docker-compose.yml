@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  servicea:
+    image: servicea:latest
+    build:
+      context: .
+      dockerfile: ServiceA/Dockerfile
+
+  serviceb:
+    image: serviceb:latest
+    build:
+      context: .
+      dockerfile: ServiceB/Dockerfile
+
+  servicec:
+    image: servicec:latest
+    build:
+      context: .
+      dockerfile: ServiceC/Dockerfile
+
+  servicegateway:
+    image: servicegateway:latest
+    build:
+      context: .
+      dockerfile: ServiceGateway/Dockerfile
+
+  sqlserver:
+    container_name: sqlserver
+
+  rabbitmq:
+    container_name: rabbitmq
+
+  redis:
+    container_name: redis
+
+  consul:
+    container_name: consul

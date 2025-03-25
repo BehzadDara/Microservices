@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceC", "ServiceC\Servic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceGateway", "ServiceGateway\ServiceGateway.csproj", "{A8876DB0-AAC8-40A2-A539-0C6AE137966E}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{4D0F88CC-8A32-40C2-85A7-907E0A6CF0CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{A8876DB0-AAC8-40A2-A539-0C6AE137966E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8876DB0-AAC8-40A2-A539-0C6AE137966E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8876DB0-AAC8-40A2-A539-0C6AE137966E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D0F88CC-8A32-40C2-85A7-907E0A6CF0CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D0F88CC-8A32-40C2-85A7-907E0A6CF0CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D0F88CC-8A32-40C2-85A7-907E0A6CF0CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D0F88CC-8A32-40C2-85A7-907E0A6CF0CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

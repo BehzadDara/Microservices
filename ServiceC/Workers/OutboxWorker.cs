@@ -27,6 +27,8 @@ public class OutboxWorker(IServiceProvider serviceProvider, IChannel channel) : 
                     var body = Encoding.UTF8.GetBytes(message.Body);
                     await channel.BasicPublishAsync($"{message.Event}_exchange", $"{message.Event}_key", body, cancellationToken);
 
+                    MetricsService.RabbitMessagesSent.Inc();
+
                     message.IsPublished = true;
                     message.ProcessedAt = DateTime.UtcNow;
                 }

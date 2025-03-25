@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: 'ServiceA'
+    metrics_path: '/metrics'
+    static_configs:      
+      - targets: ['localhost:5142']
+      #- targets: ['host.docker.internal:5142']

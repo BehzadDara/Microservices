@@ -35,6 +35,8 @@ public class ModelA1ShortCodeConsumer : BackgroundService
                 var body = eventArgs.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
+                MetricsService.RabbitMessagesReceived.Inc();
+
                 var request = JsonSerializer.Deserialize<ModelA1>(message);
                 if (request != null)
                 {

@@ -2,6 +2,7 @@ using Consul;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
 using RabbitMQ.Client;
 using ServiceB;
 using ServiceB.Consumers;
@@ -93,5 +94,8 @@ var registration = new AgentServiceRegistration
 };
 
 await consulClient.Agent.ServiceRegister(registration);
+
+app.UseHttpMetrics();
+app.MapMetrics();
 
 app.Run();

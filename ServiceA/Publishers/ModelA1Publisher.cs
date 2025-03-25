@@ -30,6 +30,8 @@ namespace ServiceA.Publishers
         {
             var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(modelA1));
             await _channel.BasicPublishAsync(ExchangeName, string.Empty, body, cancellationToken);
+
+            MetricsService.RabbitMessagesSent.Inc();
         }
     }
 }

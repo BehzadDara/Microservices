@@ -1,0 +1,66 @@
+﻿{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/swagger/v1/swagger.json",
+      "UpstreamPathTemplate": "/ServiceA/swagger/v1/swagger.json",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "servicea",
+          "Port": 8001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/ServiceA/ModelA1",
+      "UpstreamPathTemplate": "/ServiceA/ModelA1",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "servicea",
+          "Port": 8001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/ServiceA/ModelA1/{id}",
+      "UpstreamPathTemplate": "/ServiceA/ModelA1/{id}",
+      "UpstreamHttpMethod": [ "PUT", "GET" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "servicea",
+          "Port": 8001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/swagger/v1/swagger.json",
+      "UpstreamPathTemplate": "/ServiceB/swagger/v1/swagger.json",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "serviceb",
+          "Port": 8002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/ServiceB/ModelA1",
+      "UpstreamPathTemplate": "/ServiceB/ModelA1",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "serviceb",
+          "Port": 8002
+        }
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://servicegateway:8010"
+  },
+  "Consul": {
+    "Host": "consul",
+    "Port": 8500
+  }
+}

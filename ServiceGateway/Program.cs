@@ -6,7 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Configuration.AddJsonFile("ocelot.json");
+var environmentName = builder.Environment.EnvironmentName;
+builder.Configuration.AddJsonFile($"ocelot.{environmentName}.json");
 
 builder.Services
     .AddOcelot()
@@ -16,17 +17,14 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/ServiceA/swagger/v1/swagger.json", "ServiceA");
-        c.SwaggerEndpoint("/ServiceB/swagger/v1/swagger.json", "ServiceB");
+    c.SwaggerEndpoint("/ServiceA/swagger/v1/swagger.json", "ServiceA");
+    c.SwaggerEndpoint("/ServiceB/swagger/v1/swagger.json", "ServiceB");
 
-        c.RoutePrefix = string.Empty;
-    });
-}
+    c.RoutePrefix = string.Empty;
+});
 
 await app.UseOcelot();
 

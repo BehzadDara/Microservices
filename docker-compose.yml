@@ -39,3 +39,9 @@ services:
 
   consul:
     container_name: consul
+
+  prometheus:
+    container_name: prometheus
+
+  grafana:
+    container_name: grafana

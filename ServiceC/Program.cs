@@ -81,13 +81,13 @@ var registration = new AgentServiceRegistration
     Port = int.Parse(builder.Configuration["HealthCheck:Port"]!),
     Check = new AgentServiceCheck
     {
-        HTTP = $"https://{builder.Configuration["HealthCheck:Address"]}:{int.Parse(builder.Configuration["HealthCheck:Port"]!)}/healthz",
+        HTTP = $"http://{builder.Configuration["HealthCheck:Address"]}:{int.Parse(builder.Configuration["HealthCheck:Port"]!)}/healthz",
         Interval = TimeSpan.FromSeconds(10)
     }
 };
 
 await consulClient.Agent.ServiceRegister(registration);
-
+    
 app.UseHttpMetrics();
 app.MapMetrics();
 

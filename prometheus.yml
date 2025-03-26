@@ -1,9 +1,18 @@
-global:
-  scrape_interval: 10s
+﻿global:
+  scrape_interval: 5s
 
 scrape_configs:
-  - job_name: 'ServiceA'
+  - job_name: 'servicea'
     metrics_path: '/metrics'
-    static_configs:      
-      - targets: ['localhost:5142']
-      #- targets: ['host.docker.internal:5142']
+    static_configs:
+      - targets: ['servicea:8001']
+
+  - job_name: 'serviceb'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['serviceb:8002']
+
+  - job_name: 'servicec'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['servicec:8003']

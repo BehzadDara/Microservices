@@ -25,9 +25,9 @@ services:
       - redis
       - consul
 
-  serviceb:
+  serviceb_1:
     image: serviceb:latest
-    container_name: serviceb
+    container_name: serviceb_1
     build:
       context: .
       dockerfile: ServiceB/Dockerfile
@@ -40,10 +40,42 @@ services:
       - RabbitMQ:Password=guest
       - Redis:ConnectionString=redis:6379
       - Consul:Url=http://consul:8500
-      - HealthCheck:Address=serviceb
+      - HealthCheck:Address=serviceb_1
       - HealthCheck:Port=8002
+      - Service:ID=ServiceB_1
+      - Service:Name=ServiceB_1
     ports:
       - 8002:8002
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - redis
+      - consul
+
+  serviceb_2:
+    image: serviceb:latest
+    container_name: serviceb_2
+    build:
+      context: .
+      dockerfile: ServiceB/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8002
+      - ConnectionStrings:DefaultConnection=Server=sqlserver;Database=ServiceBDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true;
+      - RabbitMQ:HostName=rabbitmq
+      - RabbitMQ:UserName=guest
+      - RabbitMQ:Password=guest
+      - Redis:ConnectionString=redis:6379
+      - Consul:Url=http://consul:8500
+      - HealthCheck:Address=serviceb_2
+      - HealthCheck:Port=8002
+      - Service:ID=ServiceB_2
+      - Service:Name=ServiceB_2
+    ports:
+      - 8012:8002
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro

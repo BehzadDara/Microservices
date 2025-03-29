@@ -39,7 +39,7 @@
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "serviceb",
+          "Host": "serviceb_1",
           "Port": 8002
         }
       ]
@@ -50,10 +50,24 @@
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "serviceb",
+          "Host": "serviceb_1",
+          "Port": 8002
+        },
+        {
+          "Host": "serviceb_2",
           "Port": 8002
         }
-      ]
+      ],
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+      "ServiceDiscoveryProvider": {
+        "Scheme": "http",
+        "Host": "consul",
+        "Port": 8500,
+        "Type": "Consul",
+        "UseHealthCheck": true
+      }
     }
   ],
   "GlobalConfiguration": {

@@ -48,33 +48,26 @@
       "DownstreamPathTemplate": "/ServiceB/ModelA1",
       "UpstreamPathTemplate": "/ServiceB/ModelA1",
       "UpstreamHttpMethod": [ "GET" ],
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "serviceb_1",
-          "Port": 8002
-        },
-        {
-          "Host": "serviceb_2",
-          "Port": 8002
-        }
-      ],
+      "ServiceName": "ServiceB",
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
       },
-      "ServiceDiscoveryProvider": {
-        "Scheme": "http",
-        "Host": "consul",
-        "Port": 8500,
-        "Type": "Consul",
-        "UseHealthCheck": true
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "20s",
+        "PeriodTimespan": 10,
+        "Limit": 5
       }
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "https://servicegateway:8010"
-  },
-  "Consul": {
-    "Host": "consul",
-    "Port": 8500
+    "BaseUrl": "https://servicegateway:8010",
+    "ServiceDiscoveryProvider": {
+      "Host": "consul",
+      "Port": 8500,
+      "Type": "PollConsul",
+      "PollingInterval": 2000
+    }
   }
 }

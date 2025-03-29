@@ -1,6 +1,7 @@
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Ocelot.Provider.Consul;
+using ServiceGateway;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,7 @@ builder.Configuration.AddJsonFile($"ocelot.{environmentName}.json");
 
 builder.Services
     .AddOcelot()
-    .AddConsul();
+    .AddConsul<ConsulServiceBuilder>();
 
 builder.Services.AddSwaggerGen();
 

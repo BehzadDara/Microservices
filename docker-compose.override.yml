@@ -106,7 +106,7 @@ services:
       - 433:1433
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:4.0-management
     container_name: rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=guest
@@ -136,7 +136,7 @@ services:
     image: hashicorp/consul:1.15.4
     container_name: consul
     ports:
-      - 8500:8500
+      - 9500:8500
 
   prometheus:
     image: prom/prometheus:latest

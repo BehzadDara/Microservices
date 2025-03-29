@@ -20,9 +20,27 @@ public class ModelA1ShortCodeConsumer : BackgroundService
         _serviceScopeFactory = serviceScopeFactory;
         _channel = channel;
 
-        _channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Direct, durable: true, autoDelete: false);
-        _channel.QueueDeclareAsync(QueueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        _channel.QueueBindAsync(QueueName, ExchangeName, RoutingKey);
+        _channel.ExchangeDeclareAsync(
+            exchange: ExchangeName, 
+            type: "x-delayed-message", 
+            durable: true, 
+            autoDelete: false,
+            arguments: new Dictionary<string, object?>
+            {
+                { "x-delayed-type", "direct" }
+            });
+
+        _channel.QueueDeclareAsync(
+            queue: QueueName, 
+            durable: true, 
+            exclusive: false, 
+            autoDelete: false, 
+            arguments: null);
+
+        _channel.QueueBindAsync(
+            queue: QueueName, 
+            exchange: ExchangeName, 
+            routingKey: RoutingKey);
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)

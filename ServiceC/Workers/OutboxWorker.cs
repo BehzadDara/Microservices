@@ -1,5 +1,7 @@
 ﻿using RabbitMQ.Client;
+using ServiceC.Models;
 using System.Text;
+using System.Text.Json;
 
 namespace ServiceC.Workers;
 
@@ -20,12 +22,53 @@ public class OutboxWorker(IServiceProvider serviceProvider, IChannel channel) : 
             {
                 try
                 {
-                    await channel.ExchangeDeclareAsync($"{message.Event}_exchange", ExchangeType.Direct, durable: true, autoDelete: false, cancellationToken: cancellationToken);
-                    await channel.QueueDeclareAsync($"{message.Event}_queue", durable: true, exclusive: false, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
-                    await channel.QueueBindAsync($"{message.Event}_queue", $"{message.Event}_exchange", $"{message.Event}_key", cancellationToken: cancellationToken);
+                    await channel.ExchangeDeclareAsync(
+                        exchange: $"{message.Event}_exchange",
+                        type: "x-delayed-message",
+                        durable: true,
+                        autoDelete: false,
+                        arguments: new Dictionary<string, object?>
+                        {
+                            { "x-delayed-type", "direct" }
+                        },
+                        cancellationToken: cancellationToken);
+
+                    await channel.QueueDeclareAsync(
+                        queue: $"{message.Event}_queue",
+                        durable: true,
+                        exclusive: false,
+                        autoDelete: false,
+                        arguments: null,
+                        cancellationToken: cancellationToken);
+
+                    await channel.QueueBindAsync(
+                        queue: $"{message.Event}_queue",
+                        exchange: $"{message.Event}_exchange",
+                        routingKey: $"{message.Event}_key",
+                        cancellationToken: cancellationToken);
 
                     var body = Encoding.UTF8.GetBytes(message.Body);
-                    await channel.BasicPublishAsync($"{message.Event}_exchange", $"{message.Event}_key", body, cancellationToken);
+
+                    var modelA1 = JsonSerializer.Deserialize<ModelA1>(message.Body)!;
+                    var IsImmediate = modelA1.Id % 2 == 0;
+                    var delayInMiliseconds = IsImmediate ? 0: 5000;
+
+                    var properties = new BasicProperties
+                    {
+                        Persistent = true,
+                        Headers = new Dictionary<string, object?>
+                        {
+                            { "x-delay", delayInMiliseconds }
+                        }
+                    };
+
+                    await channel.BasicPublishAsync(
+                        exchange: $"{message.Event}_exchange",
+                        routingKey: $"{message.Event}_key",
+                        body: body,
+                        basicProperties: properties,
+                        mandatory: false,
+                        cancellationToken: cancellationToken);
 
                     MetricsService.RabbitMessagesSent.Inc();
 

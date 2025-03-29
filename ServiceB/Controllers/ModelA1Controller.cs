@@ -28,8 +28,8 @@ public class ModelA1Controller(
             var cachedModelA1s = JsonSerializer.Deserialize<List<ModelA1>>(cachedData!);
             return Ok(new
             {
-                source,
-                cachedModelA1s
+                instance = source,
+                result = cachedModelA1s
             });
         }
 
@@ -40,8 +40,8 @@ public class ModelA1Controller(
 
         return Ok(new
         {
-            source,
-            modelA1s
+            instance = source,
+            result = modelA1s
         });
     }
 }

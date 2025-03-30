@@ -43,7 +43,6 @@ services:
       - HealthCheck:Address=serviceb_1
       - HealthCheck:Port=8002
       - Service:ID=ServiceB_1
-      - Service:Name=ServiceB_1
     ports:
       - 8002:8002
     volumes:
@@ -73,7 +72,6 @@ services:
       - HealthCheck:Address=serviceb_2
       - HealthCheck:Port=8002
       - Service:ID=ServiceB_2
-      - Service:Name=ServiceB_2
     ports:
       - 8012:8002
     volumes:
@@ -85,9 +83,9 @@ services:
       - redis
       - consul
 
-  servicec:
+  servicec_1:
     image: servicec:latest
-    container_name: servicec
+    container_name: servicec_1
     build:
       context: .
       dockerfile: ServiceC/Dockerfile
@@ -99,11 +97,41 @@ services:
       - RabbitMQ:UserName=guest
       - RabbitMQ:Password=guest
       - Consul:Url=http://consul:8500
-      - ShortCodeConfig:Prefix=D
-      - HealthCheck:Address=servicec
+      - ShortCodeConfig:Prefix=D1
+      - HealthCheck:Address=servicec_1
       - HealthCheck:Port=8003
+      - Service:ID=ServiceC_1
     ports:
       - 8003:8003
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - redis
+      - consul    
+
+  servicec_2:
+    image: servicec:latest
+    container_name: servicec_2
+    build:
+      context: .
+      dockerfile: ServiceC/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8003
+      - ConnectionStrings:DefaultConnection=Server=sqlserver;Database=ServiceCDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true;
+      - RabbitMQ:HostName=rabbitmq
+      - RabbitMQ:UserName=guest
+      - RabbitMQ:Password=guest
+      - Consul:Url=http://consul:8500
+      - ShortCodeConfig:Prefix=D2
+      - HealthCheck:Address=servicec_2
+      - HealthCheck:Port=8003
+      - Service:ID=ServiceC_2
+    ports:
+      - 8013:8003
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
@@ -122,6 +150,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_HTTP_PORTS=8010
+      - Consul:Url=http://consul:8500
+      - HealthCheck:Address=servicegateway
+      - HealthCheck:Port=8010
     ports:
       - 8010:8010
     volumes:
@@ -136,6 +167,15 @@ services:
       ACCEPT_EULA: Y
     ports:
       - 433:1433
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - sqlserver
 
   rabbitmq:
     image: rabbitmq:4.0-management
@@ -168,7 +208,7 @@ services:
     image: hashicorp/consul:1.15.4
     container_name: consul
     ports:
-      - 9500:8500
+      - 8500:8500
 
   prometheus:
     image: prom/prometheus:latest
@@ -176,7 +216,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "8090:9090"
 
   grafana:
     image: grafana/grafana:latest

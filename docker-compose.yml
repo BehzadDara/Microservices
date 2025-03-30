@@ -19,7 +19,13 @@ services:
       context: .
       dockerfile: ServiceB/Dockerfile
 
-  servicec:
+  servicec_1:
+    image: servicec:latest
+    build:
+      context: .
+      dockerfile: ServiceC/Dockerfile
+
+  servicec_2:
     image: servicec:latest
     build:
       context: .
@@ -33,6 +39,9 @@ services:
 
   sqlserver:
     container_name: sqlserver
+
+  adminer:
+    container_name: adminer
 
   rabbitmq:
     container_name: rabbitmq

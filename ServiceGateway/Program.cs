@@ -1,3 +1,6 @@
+using Consul;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Ocelot.Provider.Consul;
@@ -16,6 +19,13 @@ builder.Services
 
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHealthChecks();
+
+builder.Services.AddSingleton<IConsulClient, ConsulClient>(p => new ConsulClient(cfg =>
+{
+    cfg.Address = new Uri(builder.Configuration["Consul:Url"]!);
+}));
+
 var app = builder.Build();
 
 app.UseSwagger();
@@ -26,6 +36,28 @@ app.UseSwaggerUI(c =>
 
     c.RoutePrefix = string.Empty;
 });
+
+app.UseHealthChecks("/healthz", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+var consulClient = app.Services.GetRequiredService<IConsulClient>();
+
+var registration = new AgentServiceRegistration
+{
+    ID = "ServiceGateway",
+    Name = "ServiceGateway",
+    Address = builder.Configuration["HealthCheck:Address"],
+    Port = int.Parse(builder.Configuration["HealthCheck:Port"]!),
+    Check = new AgentServiceCheck
+    {
+        HTTP = $"http://{builder.Configuration["HealthCheck:Address"]}:{int.Parse(builder.Configuration["HealthCheck:Port"]!)}/healthz",
+        Interval = TimeSpan.FromSeconds(10)
+    }
+};
+
+await consulClient.Agent.ServiceRegister(registration);
 
 await app.UseOcelot();
 

@@ -75,7 +75,7 @@ var consulClient = app.Services.GetRequiredService<IConsulClient>();
 
 var registration = new AgentServiceRegistration
 {
-    ID = "ServiceC",
+    ID = builder.Configuration["Service:ID"],
     Name = "ServiceC",
     Address = builder.Configuration["HealthCheck:Address"],
     Port = int.Parse(builder.Configuration["HealthCheck:Port"]!),

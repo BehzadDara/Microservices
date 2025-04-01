@@ -18,7 +18,7 @@ services:
       - HealthCheck:Address=servicea
       - HealthCheck:Port=8001
     ports:
-      - 8001:8001
+      - 9001:8001
     depends_on:
       - sqlserver
       - rabbitmq
@@ -44,7 +44,7 @@ services:
       - HealthCheck:Port=8002
       - Service:ID=ServiceB_1
     ports:
-      - 8002:8002
+      - 9002:8002
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
@@ -73,7 +73,7 @@ services:
       - HealthCheck:Port=8002
       - Service:ID=ServiceB_2
     ports:
-      - 8012:8002
+      - 9012:8002
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
@@ -102,7 +102,7 @@ services:
       - HealthCheck:Port=8003
       - Service:ID=ServiceC_1
     ports:
-      - 8003:8003
+      - 9003:8003
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
@@ -131,7 +131,7 @@ services:
       - HealthCheck:Port=8003
       - Service:ID=ServiceC_2
     ports:
-      - 8013:8003
+      - 9013:8003
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
@@ -154,7 +154,7 @@ services:
       - HealthCheck:Address=servicegateway
       - HealthCheck:Port=8010
     ports:
-      - 8010:8010
+      - 9010:8010
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
@@ -173,7 +173,7 @@ services:
     container_name: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 9080:8080
     depends_on:
       - sqlserver
 
@@ -216,7 +216,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "8090:9090"
+      - "9090:9090"
 
   grafana:
     image: grafana/grafana:latest
@@ -225,3 +225,30 @@ services:
       - "2000:3000"
     depends_on:
       - prometheus
+
+  elasticsearch:
+    image: docker.io/library/elasticsearch:8.9.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+
+  logstash:
+    image: docker.io/library/logstash:8.9.0
+    container_name: logstash
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5044:5044"
+
+  kibana:
+    image: docker.io/library/kibana:8.9.0
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"

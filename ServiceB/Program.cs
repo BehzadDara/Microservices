@@ -4,11 +4,17 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
 using RabbitMQ.Client;
+using Serilog;
 using ServiceB;
 using ServiceB.Consumers;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ServiceBDBContext>(options => options.UseSqlServer(connectionString));

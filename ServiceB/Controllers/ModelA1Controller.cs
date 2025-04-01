@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using ServiceB.Models;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -25,6 +26,8 @@ public class ModelA1Controller(
         var cachedData = await cache.StringGetAsync(cacheKey);
         if (cachedData.HasValue)
         {
+            Log.Information($"{source} - Cache Hit for key {cacheKey}");
+
             var cachedModelA1s = JsonSerializer.Deserialize<List<ModelA1>>(cachedData!);
             return Ok(new
             {
@@ -32,6 +35,8 @@ public class ModelA1Controller(
                 result = cachedModelA1s
             });
         }
+
+        Log.Information($"{source} - Cache Miss for key {cacheKey}");
 
         var modelA1s = await set.ToListAsync(cancellationToken);
 

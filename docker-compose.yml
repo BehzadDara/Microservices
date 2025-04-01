@@ -60,3 +60,12 @@ services:
 
   grafana:
     container_name: grafana
+
+  elasticsearch:
+    container_name: elasticsearch
+
+  logstash:
+    container_name: logstash
+
+  kibana:
+    container_name: kibana

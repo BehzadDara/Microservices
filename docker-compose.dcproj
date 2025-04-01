@@ -15,6 +15,7 @@
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="logstash.conf" />
     <None Include="prometheus.yml" />
   </ItemGroup>
 </Project>
